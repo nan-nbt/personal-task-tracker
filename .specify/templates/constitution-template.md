@@ -1,50 +1,39 @@
 # [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Simple, Readable, Bounded Implementation
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+Implementations MUST use the simplest readable approach that satisfies approved requirements. Added complexity MUST be justified by a specific approved requirement.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### II. Requirements and Technology Choices Are Separate
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+Specifications MUST express user needs and observable outcomes without requiring a particular technology. Implementation plans MUST record technology choices separately from requirements, with rationale and alternatives.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### III. Validated Input
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+Every user-provided value MUST be checked against its documented constraints before it is accepted or used. Invalid values MUST be rejected without changing valid task data, and the user MUST receive actionable feedback.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### IV. Safe Saved Data
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+Saved task data MUST be treated as untrusted when read. Invalid input and failed saves MUST NOT overwrite the last known-good saved state, and load or save failures MUST be reported without claiming success.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### V. Core Flow Verification
+
+Every core user flow identified in a feature specification MUST have an acceptance scenario and at least one executable automated test or repeatable manual verification. Before work is reported complete, each required verification MUST be run and pass, with its result recorded.
+
+## Additional Constraints
+
+The product scope is a small personal Task Tracker web app. Features MUST directly support an approved task-tracking requirement; unrelated product features are out of scope unless the project owner explicitly approves a scope change.
+
+## Development Workflow
+
+AI MAY propose implementation and technology options. Before implementation begins, the project owner MUST review and approve proposed technology decisions. Specifications and plans MUST make requirements, proposed choices, and accepted decisions distinguishable. Completion reports MUST state which core-flow verifications were run and their results.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+The constitution is the project authority for enduring principles and supersedes conflicting guidance. The project owner may amend it by reviewing and approving a proposed change; amendments MUST update affected templates and guidance in the same change. Each amendment MUST record its impact in the Sync Impact Report at the top of the constitution. Reviewers MUST check proposed work and completion evidence against these principles; unresolved conflicts MUST be addressed before implementation or completion.
+
+Use semantic versioning for this constitution: increment MAJOR for a backward-incompatible change to a principle or project-wide policy, MINOR for a new or materially expanded principle or section, and PATCH for clarifications and other non-semantic edits. Record the amendment date using ISO format.
 
 **Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->

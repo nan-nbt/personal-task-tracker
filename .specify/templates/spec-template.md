@@ -80,6 +80,8 @@
 
 ## Requirements *(mandatory)*
 
+Requirements MUST describe user needs and observable outcomes without prescribing a technology. Record implementation and technology options separately in the plan, including rationale and alternatives. Keep scope limited to approved task-tracking needs; do not add unrelated product features. For requirements that accept input, specify the constraints and behavior for invalid values. For requirements that save data, specify how invalid saved data and failed saves are handled without losing the last known-good state. Acceptance scenarios MUST cover every core user flow.
+
 <!--
   ACTION REQUIRED: The content in this section represents placeholders.
   Fill them out with the right functional requirements.

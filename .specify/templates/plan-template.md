@@ -36,11 +36,26 @@
 
 **Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
 
+### Technology Decisions
+
+For each technology choice, label it **Proposed** or **Approved**. Record its rationale and alternatives; do not treat a proposal as approved until the project owner reviews it.
+
+| Area | Choice | Status (Proposed/Approved) | Rationale | Alternatives considered |
+|------|--------|----------------------------|-----------|-------------------------|
+| [Area] | [Choice] | [Status] | [Rationale] | [Alternatives] |
+
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- [ ] **Simple, readable, bounded implementation**: Proposed complexity is necessary for approved requirements; every added complexity has a specific justification.
+- [ ] **Requirements and technology choices are separate**: Requirements are implementation-neutral; technology choices and their rationale are documented separately and marked Proposed or Approved after project-owner review.
+- [ ] **Validated input**: Each input has documented constraints, rejection behavior, and user feedback for invalid values.
+- [ ] **Safe saved data**: Saved data is treated as untrusted; invalid input or failed saves cannot overwrite the last known-good state, and failures are surfaced.
+- [ ] **Core flow verification**: Each core user flow has an acceptance scenario and a planned automated test or repeatable manual verification; the results will be run and recorded before completion.
+- [ ] **Bounded product scope**: Each proposed feature supports an approved task-tracking requirement; unrelated features are excluded or explicitly approved as a scope change.
+
+Record any violation, its concrete justification, and the simpler alternative considered in Complexity Tracking. Re-check every item after Phase 1 design.
 
 ## Project Structure
 
