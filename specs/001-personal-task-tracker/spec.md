@@ -6,23 +6,34 @@
 
 **Status**: Draft
 
-**Input**: User description: "Build a small Task Tracker web app for personal use. Agreed requirements: let me add a task by entering its name; prevent adding tasks with an empty name or a name containing only spaces; let me view my tasks and mark them as complete; completed tasks must stay visible until I delete them myself; let me delete tasks, but ask for confirmation before deleting and delete only if I confirm; tasks must still be available when I close the app and open it again. Not decided yet: whether a completed task can be changed back to incomplete; whether I need to access the same tasks across multiple devices; where tasks are stored. Keep the scope limited to the agreed requirements. Do not add features or silently choose behavior for the items marked not decided yet; keep those items visible for review."
+**Input**: Build a small personal Task Tracker web app. Add tasks by title, view tasks, mark them complete, retain completed tasks until confirmed deletion, and preserve tasks after closing and reopening the app. The user additionally confirms persistence after refreshing the same browser, no login/sharing/multi-user collaboration, rejection of blank or whitespace-only titles, continued visibility of completed tasks, and confirmation before deletion. Completed-task reversal, cross-device access, and storage location remain undecided.
+
+## Clarifications
+
+### Session 2026-11-12
+
+- Q: What must remain after refreshing the same browser? → A: Tasks and their completion state remain available.
+- Q: What is the personal-use scope? → A: No login, sharing, or multi-user collaboration.
+- Q: Which titles must be rejected? → A: Blank titles and titles containing only whitespace.
+- Q: What happens to completed tasks? → A: They stay visible in the list until deleted by the user.
+- Q: How does deletion work? → A: Ask for confirmation first; confirming deletes the task, and cancelling keeps it.
 
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Capture and review tasks (Priority: P1)
 
-As a person keeping track of my own to-dos, I want to add tasks by name and see my task list so I can remember what I need to do.
+As a person keeping track of my own to-dos, I want to add tasks by title and see my personal task list so I can remember what I need to do.
 
 **Why this priority**: Creating and viewing tasks is the foundation of a useful task tracker.
 
-**Independent Test**: Add a valid task and verify it appears in the task list; attempt to add an empty or spaces-only name and verify it is rejected without adding a task.
+**Independent Test**: Use the list without login, add a valid task, and verify that blank or whitespace-only titles are rejected without changing the list.
 
 **Acceptance Scenarios**:
 
-1. **Given** the task list is open, **When** I enter a name containing at least one non-whitespace character and submit it, **Then** a task with that name is added and visible in the list.
-2. **Given** the task list is open, **When** I submit an empty name or a name containing only spaces, **Then** no task is added and I receive feedback that a name is required.
+1. **Given** the task list is open, **When** I submit a title containing at least one non-whitespace character, **Then** a task with that title is added and visible in the list.
+2. **Given** the task list is open, **When** I submit a blank title or a title containing only whitespace (including spaces, tabs, or line breaks), **Then** no task is added, existing tasks remain unchanged, and I receive feedback that a title is required.
 3. **Given** one or more tasks exist, **When** I view the task list, **Then** the tasks are visible with their completion state.
+4. **Given** I want to use my personal task list, **When** I open it to add, view, complete, or delete tasks, **Then** no login is required and no sharing or multi-user collaboration is provided.
 
 ---
 
@@ -32,12 +43,12 @@ As a person tracking my to-dos, I want to mark a task complete and keep complete
 
 **Why this priority**: Completion tracking is a core task-tracking outcome, and retaining completed tasks is explicitly required.
 
-**Independent Test**: Mark an incomplete task complete and verify it is still present and visibly complete in the list, including after reopening the app.
+**Independent Test**: Mark an incomplete task complete and verify it stays visible as complete, including after refreshing the same browser and reopening the app.
 
 **Acceptance Scenarios**:
 
-1. **Given** an incomplete task is visible, **When** I mark it complete, **Then** it remains visible and is shown as complete.
-2. **Given** a completed task is visible, **When** I view the task list or reopen the app, **Then** the completed task remains visible as complete unless I have deleted it.
+1. **Given** an incomplete task is visible, **When** I mark it complete, **Then** it remains visible in the list and is shown as complete.
+2. **Given** a completed task has not been deleted, **When** I view the list, refresh the same browser, or close and reopen the app, **Then** it remains visible as complete.
 
 ---
 
@@ -47,71 +58,73 @@ As a person managing my own to-dos, I want to confirm before deleting a task so 
 
 **Why this priority**: Users need control over removing tasks, while confirmation protects against accidental deletion.
 
-**Independent Test**: Request deletion of a task, verify it remains until confirmation, then separately verify that confirming deletes it and declining leaves it intact.
+**Independent Test**: Request deletion of an incomplete or completed task; verify it remains until confirmation, confirming deletes only that task, and cancelling keeps it unchanged.
 
 **Acceptance Scenarios**:
 
-1. **Given** a task is visible, **When** I request its deletion, **Then** I am asked to confirm and the task is not yet deleted.
+1. **Given** an incomplete or completed task is visible, **When** I request its deletion, **Then** I am asked to confirm and the task is not yet deleted.
 2. **Given** a deletion confirmation is shown, **When** I confirm, **Then** only the selected task is deleted.
-3. **Given** a deletion confirmation is shown, **When** I decline or cancel, **Then** the task remains visible and unchanged.
+3. **Given** a deletion confirmation is shown, **When** I cancel, **Then** the task remains visible with its title and completion state unchanged.
 
 ---
 
 ### User Story 4 - Return to saved tasks (Priority: P1)
 
-As a person using the tracker over time, I want my tasks to still be available after closing and reopening the app so I do not have to recreate them.
+As a person using the tracker over time, I want tasks and completion states to remain available after refreshing the same browser or closing and reopening the app so I do not have to recreate them.
 
-**Why this priority**: The tracker must preserve task information between sessions to be useful for ongoing personal use.
+**Why this priority**: The tracker must preserve task information for ongoing personal use.
 
-**Independent Test**: Add tasks, close the app, reopen it, and verify the same tasks and completion states are present.
+**Independent Test**: Add tasks, complete some, confirm one deletion, and cancel another deletion. Refresh the same browser and separately close and reopen the app; verify the retained tasks and completion states, and that the deleted task does not return.
 
 **Acceptance Scenarios**:
 
-1. **Given** I have added tasks and set their completion states, **When** I close and reopen the app, **Then** those tasks and states are still available.
-2. **Given** a task deletion has been confirmed, **When** I close and reopen the app, **Then** the deleted task is not restored.
+1. **Given** I have added tasks and marked some complete, **When** I refresh the same browser, **Then** all retained tasks have the same titles and completion states.
+2. **Given** I confirmed one task deletion and cancelled another, **When** I refresh the same browser, **Then** the deleted task remains absent and the retained task remains unchanged.
+3. **Given** I have added tasks and set their completion states, **When** I close and reopen the app, **Then** those tasks and states remain available and confirmed deletions are not restored.
 
 ### Edge Cases
 
-- An empty task name and a name made only of spaces are rejected; neither changes the task list.
-- Declining a deletion confirmation leaves the selected task unchanged.
-- If task data cannot be loaded or is invalid, the app must not silently present an empty list as though no tasks existed or overwrite saved data without informing the user.
-- If a task change cannot be saved, the app must not claim that the change was saved; it must preserve the last known-good saved task data and inform the user.
+- Blank and whitespace-only task titles are rejected without changing valid tasks.
+- Cancelling deletion preserves both incomplete and completed tasks unchanged.
+- If saved task data is invalid or cannot be loaded, the app reports the problem without claiming the list is empty or replacing saved data with an empty list.
+- If a task change cannot be saved, the app reports the failure, does not claim success, and preserves the last known-good saved task data.
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
-- **FR-001**: The app MUST allow the user to add a task by entering its name.
-- **FR-002**: The app MUST reject a task name that is empty or contains only spaces, MUST leave the task list unchanged in that case, and MUST give the user actionable feedback.
+- **FR-001**: The app MUST allow the user to add a task by entering its title.
+- **FR-002**: The app MUST reject blank or whitespace-only titles, leave valid task data unchanged, and provide actionable feedback.
 - **FR-003**: The app MUST allow the user to view their tasks and each task's completion state.
-- **FR-004**: The app MUST allow the user to mark an incomplete task as complete.
-- **FR-005**: A completed task MUST remain visible until the user deletes it.
-- **FR-006**: Before deleting a task, the app MUST request confirmation. It MUST delete the selected task only after the user confirms; declining or cancelling MUST leave it unchanged.
-- **FR-007**: The user's tasks and completion states MUST remain available after the user closes and reopens the app.
-- **FR-008**: If task data cannot be loaded or is invalid, the app MUST inform the user and MUST NOT silently show an empty task list as if no tasks existed or overwrite saved data without informing the user.
-- **FR-009**: If a task change cannot be saved, the app MUST inform the user, MUST NOT claim the change was saved, and MUST preserve the last known-good saved task data.
+- **FR-004**: The app MUST allow the user to mark an incomplete task complete. Whether completion can be reversed remains undecided.
+- **FR-005**: Completed tasks MUST stay visible in the list until the user confirms their deletion.
+- **FR-006**: Deletion MUST require confirmation before removing a task. Confirming MUST delete only the selected task; cancelling MUST keep it unchanged.
+- **FR-007**: Tasks, titles, and completion states MUST remain available after refreshing the same browser and after closing and reopening the app. Confirmed deletions MUST remain deleted.
+- **FR-008**: Invalid saved data and load failures MUST be reported without claiming success or overwriting the last known-good saved state.
+- **FR-009**: Failed saves MUST be reported without claiming success or overwriting the last known-good saved state.
+- **FR-010**: This MUST be a personal task list with no login, sharing, or multi-user collaboration.
 
 ### Key Entities *(include if feature involves data)*
 
-- **Task**: A user-created to-do with a name and a completion state. A task remains in the user's list until the user confirms its deletion.
+- **Task**: A user-created to-do with a title and a completion state. It remains in the list until the user confirms deletion.
 
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
 
-- **SC-001**: In a usability check, a user can add a valid task and find it in the list within 30 seconds.
-- **SC-002**: 100% of empty and spaces-only task-name submissions are rejected without creating a task.
-- **SC-003**: 100% of completed tasks remain visible after completion and after closing and reopening the app, unless the user confirmed deletion.
-- **SC-004**: 100% of deletion attempts leave a task intact until confirmation; declining confirmation never deletes it.
-- **SC-005**: In a repeatable close-and-reopen check, all tasks and their completion states are available after reopening, and confirmed deletions remain deleted.
+- **SC-001**: In a usability check, a user can add a valid task and find it in the list within 30 seconds, without login.
+- **SC-002**: 100% of blank and whitespace-only title submissions are rejected without creating a task or changing existing tasks.
+- **SC-003**: 100% of completed tasks remain visible after completion and after browser refresh or app reopening, unless their deletion was confirmed.
+- **SC-004**: 100% of deletion attempts preserve the selected task until confirmation; cancelling never deletes or changes it.
+- **SC-005**: In repeatable same-browser refresh and close-and-reopen checks, all retained tasks preserve their titles and completion states, and confirmed deletions remain absent.
 
 ## Assumptions
 
-- The app is for personal task tracking, and the user is the person creating, completing, viewing, and deleting tasks.
+- The user is the person creating, viewing, completing, and deleting tasks. Login, sharing, and multi-user collaboration are excluded.
 - No external system dependencies are specified for the agreed task-tracking flows.
-- A task name is valid when it contains at least one non-whitespace character; no other name restrictions are defined here.
-- Persistence is required across closing and reopening the app, but this specification does not select where or how task data is stored.
-- The following product decisions remain open for review and are not requirements or assumptions in this specification:
+- A title must contain at least one non-whitespace character; no other title restrictions are specified.
+- Persistence requirements describe behavior, not a storage technology or location.
+- The following decisions remain open for review and MUST NOT be silently selected:
   1. Whether a completed task can be changed back to incomplete.
-  2. Whether the same tasks need to be accessible across multiple devices.
+  2. Whether the same personal task list needs to be accessible across multiple devices.
   3. Where tasks are stored.
