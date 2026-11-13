@@ -8,7 +8,7 @@
 
 Build one personal task-list screen: add a nonblank title, view all tasks and their completion state, mark incomplete tasks complete, and delete only after confirmation. Retain completed tasks and persist successful changes across refresh and close/reopen in the same browser. Use React/TypeScript with Vite, Vitest/React Testing Library, and localStorage. No login, backend, G2FW, sharing, routing, or unrelated task features.
 
-The owner has resolved the specification's open decisions: one-way completion, no cross-device requirement, and browser localStorage. The original specification is not rewritten by this planning command. Supporting design choices remain explicitly Proposed until owner review. This command generates design artifacts only, not implementation or `tasks.md`.
+The owner has resolved the specification's open decisions: one-way completion, no cross-device requirement, and browser localStorage. The original requirements are retained with a dated clarification. Supporting implementation choices remain Proposed until separately approved by the owner before implementation. This command generates design artifacts only, not implementation or `tasks.md`.
 
 ## Technical Context
 
@@ -18,7 +18,7 @@ The owner has resolved the specification's open decisions: one-way completion, n
 
 **Storage**: Browser localStorage; proposed single versioned JSON snapshot at `task-tracker.tasks`.
 
-**Testing**: Vitest and React Testing Library; proposed jsdom, jest-dom, user-event; repeatable real-browser refresh/reopen and timed usability checks.
+**Testing**: Vitest and React Testing Library; proposed jsdom, jest-dom, and user-event supporting test dependencies; repeatable real-browser refresh/reopen and timed usability checks.
 
 **Target Platform**: Modern desktop/mobile browsers with localStorage and `crypto.randomUUID`, served on a stable HTTP(S) origin; one active app instance in one browser profile. Proposed Node.js 22.12+ or a newer LTS meeting selected tooling engines, with npm for tooling.
 
@@ -45,14 +45,14 @@ The owner has resolved the specification's open decisions: one-way completion, n
 | Confirmation | Native `window.confirm` | Proposed | Smallest confirmation supporting FR-006 | Custom dialog adds focus-management work |
 | Supporting tooling | npm lockfile; compatible stable versions; jsdom/jest-dom/user-event | Proposed | Reproducible build and interaction tests | Extra frameworks not needed |
 
-Rationale and alternatives are expanded in [research.md](research.md). Proposed design choices require owner review before implementation under constitution Development Workflow.
+Rationale and alternatives are expanded in [research.md](research.md). Owner-approved technology choices and supporting proposals are distinguished in the table above; proposals require review before implementation.
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
 - [x] **Simple, readable, bounded implementation**: One screen with three focused model/storage/UI responsibilities. Versioning and explicit save transactions justify their small complexity with FR-008/FR-009.
-- [x] **Requirements and technology choices are separate**: Original spec stays implementation-neutral and unchanged; owner selections and design proposals are distinguished above. Historical open decisions are resolved explicitly here, not silently selected.
+- [x] **Requirements and technology choices are separate**: Functional requirements remain implementation-neutral; implementation choices are documented separately and technology choices are marked Approved following owner review. Supporting design proposals remain subject to review before implementation. Resolved historical decisions are recorded in the dated spec clarification.
 - [x] **Validated input**: Title, task identity, confirmation result, task fields, snapshot version, and ID uniqueness have constraints and rejection behavior in [data-model.md](data-model.md) and [contracts/ui-and-storage.md](contracts/ui-and-storage.md).
 - [x] **Safe saved data**: Whole-snapshot validation, no writes during load, mutation blocking after load error, and persist-before-commit transactions preserve the last good state and expose failures.
 - [x] **Core flow verification**: All four stories and failure cases map to automated and manual checks in [quickstart.md](quickstart.md). These checks must run and actual results be recorded before implementation completion; this plan does not claim they passed.
@@ -60,7 +60,7 @@ Rationale and alternatives are expanded in [research.md](research.md). Proposed 
 
 **Pre-research gate**: PASS against constitution 1.0.0 using the selected bounded approach and planned safety/verification requirements. No unjustified violations.
 
-**Post-design gate**: PASS. Data model, UI/storage contract, file responsibilities, and verification matrix preserve all six checks. The gate approves planning completeness, not execution of not-yet-written tests or approval of Proposed choices. Before implementation: owner reviews design proposals; before implementation completion: execute and record core-flow verification.
+**Post-design gate**: PASS. Data model, UI/storage contract, file responsibilities, and verification matrix preserve all six checks. Owner-approved technology choices are distinguished from supporting proposals, which require owner approval before implementation. Tests have not yet been written or run; before implementation completion, execute and record all core-flow verification.
 
 ## Project Structure
 
@@ -68,7 +68,7 @@ Rationale and alternatives are expanded in [research.md](research.md). Proposed 
 
 ```text
 specs/001-personal-task-tracker/
-├── spec.md                       # Existing requirements; unchanged
+├── spec.md                       # Existing requirements plus dated owner clarification
 ├── plan.md                       # This plan
 ├── research.md                   # Decisions, rationale, alternatives
 ├── data-model.md                 # Task/snapshot shapes and transitions
@@ -135,4 +135,4 @@ Model tests cover whitespace (spaces, tabs, line breaks), valid-title preservati
 
 ## Complexity Tracking
 
-No constitution violations; no complexity exceptions or deviation log required. The standalone stack follows the owner's explicit instruction rather than unrelated company-stack guidance. Constitution and immutable specification content are unchanged.
+No constitution violations; no complexity exceptions or deviation log required. The standalone stack follows the owner's explicit instruction rather than unrelated company-stack guidance. The constitution is unchanged; the spec adds only a dated clarification recording the owner's resolved decisions.

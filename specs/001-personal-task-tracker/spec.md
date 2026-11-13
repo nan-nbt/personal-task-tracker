@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: Build a small personal Task Tracker web app. Add tasks by title, view tasks, mark them complete, retain completed tasks until confirmed deletion, and preserve tasks after closing and reopening the app. The user additionally confirms persistence after refreshing the same browser, no login/sharing/multi-user collaboration, rejection of blank or whitespace-only titles, continued visibility of completed tasks, and confirmation before deletion. Completed-task reversal, cross-device access, and storage location remain undecided.
+**Input**: Build a small personal Task Tracker web app. Add tasks by title, view tasks, mark them complete, retain completed tasks until confirmed deletion, and preserve tasks after closing and reopening the app. The user additionally confirms persistence after refreshing the same browser, no login/sharing/multi-user collaboration, rejection of blank or whitespace-only titles, continued visibility of completed tasks, and confirmation before deletion. Later owner decisions resolve completion as one-way, limit access to the same browser, and select browser localStorage; see the dated clarification below.
 
 ## Clarifications
 
@@ -17,6 +17,12 @@
 - Q: Which titles must be rejected? → A: Blank titles and titles containing only whitespace.
 - Q: What happens to completed tasks? → A: They stay visible in the list until deleted by the user.
 - Q: How does deletion work? → A: Ask for confirmation first; confirming deletes the task, and cancelling keeps it.
+
+### Session 2026-11-13
+
+- Q: Can a completed task be changed back to incomplete? → A: No; completion is one-way.
+- Q: Is cross-device access required? → A: No; this is a single-browser personal task list.
+- Q: Where are tasks stored? → A: In browser localStorage.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -96,7 +102,7 @@ As a person using the tracker over time, I want tasks and completion states to r
 - **FR-001**: The app MUST allow the user to add a task by entering its title.
 - **FR-002**: The app MUST reject blank or whitespace-only titles, leave valid task data unchanged, and provide actionable feedback.
 - **FR-003**: The app MUST allow the user to view their tasks and each task's completion state.
-- **FR-004**: The app MUST allow the user to mark an incomplete task complete. Whether completion can be reversed remains undecided.
+- **FR-004**: The app MUST allow the user to mark an incomplete task complete. Completion reversal is not supported (resolved 2026-11-13).
 - **FR-005**: Completed tasks MUST stay visible in the list until the user confirms their deletion.
 - **FR-006**: Deletion MUST require confirmation before removing a task. Confirming MUST delete only the selected task; cancelling MUST keep it unchanged.
 - **FR-007**: Tasks, titles, and completion states MUST remain available after refreshing the same browser and after closing and reopening the app. Confirmed deletions MUST remain deleted.
@@ -124,7 +130,4 @@ As a person using the tracker over time, I want tasks and completion states to r
 - No external system dependencies are specified for the agreed task-tracking flows.
 - A title must contain at least one non-whitespace character; no other title restrictions are specified.
 - Persistence requirements describe behavior, not a storage technology or location.
-- The following decisions remain open for review and MUST NOT be silently selected:
-  1. Whether a completed task can be changed back to incomplete.
-  2. Whether the same personal task list needs to be accessible across multiple devices.
-  3. Where tasks are stored.
+- Decisions originally open in this specification have since been resolved by the owner on 2026-11-13: completion is one-way; cross-device access is not required; and tasks are stored in browser localStorage. See the dated clarification above.

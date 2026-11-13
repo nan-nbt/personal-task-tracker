@@ -4,7 +4,7 @@
 
 **Scope**: One standalone React/TypeScript/Vite screen, Vitest/React Testing Library, localStorage, one-way completion. No login, sharing, backend, G2FW, reversal, editing, filtering, or extra task metadata.
 
-**Review status**: The owner requests decomposition of the reviewed plan. Execute its design, not new technology proposals; changes to reviewed decisions require owner approval before implementation. The spec's historical open decisions are resolved by the owner decisions recorded in the plan.
+**Review status**: The owner reviewed and approved the consistency corrections proposed in the analysis. Implementation choices still marked Proposed in `plan.md` remain subject to owner approval before implementation. The spec's historical open decisions are resolved by the dated clarification.
 
 **Verification**: Write tests before implementing the corresponding behavior, observe the intended failure, implement, and run again. Verification tasks record actual results in `quickstart.md`; a checked task means its work/check actually completed. No implementation checks have run during task generation.
 
@@ -64,7 +64,7 @@ Tasks use `- [ ] Tnnn [P?] [USn?] Description with file path`. Paths are reposit
 ### Core Flow Verification (tests first)
 
 - [ ] T016 [P] [US2] Write failing complete-candidate tests in `src/tasks.test.ts` for selecting stable ID, preserving peers/order/input, rejecting unknown/invalid IDs, and treating already-completed targets as no-op without reversal
-- [ ] T017 [P] [US2] Write failing RTL tests in `src/App.test.tsx` for complete action, retained complete text, no mark-incomplete action, no write for repeated/no-op completion, same-storage remount restoration, and failed save preserving displayed incomplete state and seeded raw bytes with feedback
+- [ ] T017 [P] [US2] Write failing RTL tests in `src/App.test.tsx` for complete action, retained complete text, no mark-incomplete or reversal action, same-storage remount restoration, and failed save preserving displayed incomplete state and seeded raw bytes with feedback; test repeated-completion no-op only at the model boundary in T016
 
 ### Implementation
 
@@ -82,12 +82,12 @@ Tasks use `- [ ] Tnnn [P?] [USn?] Description with file path`. Paths are reposit
 
 ### Core Flow Verification (tests first)
 
-- [ ] T021 [P] [US4] Extend `src/taskStorage.test.ts` with full corruption/failure matrix and serialization failure mocking at the boundary; reject one bad member without partial salvage and assert original bytes/unrelated keys preserved after errors, including successfully persisted empty snapshots
-- [ ] T022 [P] [US4] Extend `src/App.test.tsx` with add/complete unmount/remount restoration and React StrictMode load tests for corrupt/getter/read failures; assert no writes on mount, blocking actionable error rather than empty-list claim, unavailable mutations, failed-save no-success/list/draft preservation, and later successful retry clearing the save error
+- [ ] T021 [US4] Add a focused StrictMode integration test in `src/App.test.tsx` proving React mount/remount reads valid and corrupt saved data without writing or removing storage
+- [ ] T022 [US4] Extend `src/App.test.tsx` with add/complete unmount/remount restoration and load/save error UI tests for corrupt/getter/read failures; assert blocking actionable feedback, unavailable mutations, failed-save no-success/list/draft preservation, and later successful retry clearing the save error
 
 ### Implementation and verification
 
-- [ ] T023 [US4] Harden `src/taskStorage.ts` against all T021 cases using the existing small synchronous adapter; copy only recognized validated fields, keep unknown-version handling as rejection, and introduce no reset, migration, backup, queue or partial recovery
+- [ ] T023 [US4] Review `src/taskStorage.ts` against the T005 tests and fix only any observed failures; do not duplicate the corruption/failure test matrix or add reset, migration, backup, queue or partial recovery
 - [ ] T024 [US4] Harden `src/App.tsx` load/error and transaction handling against T022; disable mutations after failed load, suggest resolving storage/reloading, commit only saved candidates, preserve last-good tasks on error, clear stale save errors after successful retry, and keep all storage side effects outside React updaters/effects
 - [ ] T025 [US4] Run `npm test -- src/taskStorage.test.ts src/App.test.tsx`; follow same-origin refresh and normal browser close/reopen checks for mixed-state retained tasks from `quickstart.md`, record results in `specs/001-personal-task-tracker/quickstart.md`, and explicitly mark the confirmed/cancelled-deletion subscenarios pending T031 rather than passed
 - [ ] T026 [US4] Update `specs/001-personal-task-tracker/quickstart.md` to reflect implemented storage key/version, supported browser/origin assumptions, load/save feedback, unchanged-data guarantees and run instructions; retain accurate evidence and reference `data-model.md`/`contracts/ui-and-storage.md` rather than duplicating implementation
@@ -120,7 +120,8 @@ Tasks use `- [ ] Tnnn [P?] [USn?] Description with file path`. Paths are reposit
 - [ ] T032 Review `src/App.tsx`, `src/styles.css`, `src/tasks.ts`, and `src/taskStorage.ts` against `specs/001-personal-task-tracker/contracts/ui-and-storage.md` and FR-001–FR-010; correct actual accessibility/data-safety gaps, ensure no HTML injection or unapproved features, and retain native confirmation/minimal module boundaries
 - [ ] T033 After the last code edit run `npm test` and `npm run build` from the root using `package.json`; fix failures and record actual final command/date/test summary/type-check/build results in `specs/001-personal-task-tracker/quickstart.md`
 - [ ] T034 Repeat every real-browser core-flow scenario in `specs/001-personal-task-tracker/quickstart.md` on an isolated same-origin/profile: timed add/find under 30 seconds, invalid submission, completed visibility, both-state deletion confirm/cancel, refresh, and normal close/reopen; record expected versus observed tasks/states/deletions and pass/fail, never substitute jsdom for real reopening
-- [ ] T035 Finalize `specs/001-personal-task-tracker/quickstart.md` start/test instructions and actual verification evidence, check this `specs/001-personal-task-tracker/tasks.md` against the traceability matrix, and report incomplete/blocked checks explicitly; close implementation only after all required flows and final checks pass
+- [ ] T035 Finalize `specs/001-personal-task-tracker/quickstart.md` start/test instructions and actual verification evidence; check this `specs/001-personal-task-tracker/tasks.md` against the traceability matrix; report incomplete/blocked checks explicitly; close implementation only after all required flows and final checks pass
+
 
 ## Dependencies & Execution Order
 
@@ -151,8 +152,8 @@ Stories follow priorities P1 (US1, US2, US4), then P2 (US3). US4's saved deletio
 | T012 → T013 → T014 → T015 | T010/T011 failures observed; implement model, UI, styles, then run/record story checks |
 | T016, T017 | T015; parallel model/UI tests |
 | T018 → T019 → T020 | T016/T017 failures observed; operation, integration, checks |
-| T021, T022 | T020; parallel adapter/UI tests |
-| T023 → T024 → T025 → T026 | T021/T022 failures observed; adapter, UI, checks, instructions |
+| T021 → T022 | T020; same-file mount-safety test then restoration/error tests, serialize edits |
+| T023 → T024 → T025 → T026 | T021/T022 failures observed; review adapter against T005, fix only observed gaps, UI, checks, instructions |
 | T027, T028 | T026; parallel model/UI tests |
 | T029 → T030 → T031 | T027/T028 failures observed; operation, UI, automated/manual persistence checks |
 | T032 → T033 → T034 → T035 | T031; final review/corrections, checks after last edit, manual checks, evidence/report |
@@ -161,16 +162,15 @@ All tasks are written in recommended execution order. Only paired test-authoring
 
 ## Parallel Examples Per Story
 
-After each preceding checkpoint, launch these independent test-writing tasks together, then resume sequential implementation:
+After each preceding checkpoint, launch independent test-writing tasks together, then resume sequential implementation:
 
 | Story | Workstream A | Workstream B | Join before |
 |-------|--------------|--------------|-------------|
 | US1 | T010: `src/tasks.test.ts` add candidates | T011: `src/App.test.tsx` capture/view UI | T012–T015 |
 | US2 | T016: `src/tasks.test.ts` completion | T017: `src/App.test.tsx` completion UI | T018–T020 |
-| US4 | T021: `src/taskStorage.test.ts` corruption/failures | T022: `src/App.test.tsx` restoration/error UI | T023–T026 |
 | US3 | T027: `src/tasks.test.ts` deletion | T028: `src/App.test.tsx` confirmation UI | T029–T031 |
 
-Foundation also permits T004 (`src/tasks.test.ts`) and T005 (`src/taskStorage.test.ts`) in parallel. Writing tests is concurrent; failure observation, implementation and completion checks still follow the listed prerequisites.
+US4 tasks T021/T022 both edit `src/App.test.tsx`, so serialize them rather than parallelizing. Foundation permits T004 (`src/tasks.test.ts`) and T005 (`src/taskStorage.test.ts`) in parallel. Failure observation, implementation and completion checks still follow the listed prerequisites.
 
 ## Required Behavior Traceability
 
@@ -178,17 +178,17 @@ Foundation also permits T004 (`src/tasks.test.ts`) and T005 (`src/taskStorage.te
 |-----------------------------------|----------------------|-------------------------------------|
 | FR-001 add; US1 scenario 1 | T012–T013 | T010–T011, T015, T034 |
 | FR-002 reject blank/whitespace unchanged with feedback; US1 scenario 2; SC-002 | T006, T012–T013 | T004, T010–T011, T015, T034 |
-| FR-003 view titles/states; US1 scenario 3 | T013–T014, T019 | T011, T017, T015, T020 |
+| FR-003 view titles/states; US1 scenario 3 | T013–T014, T019 | T011, T015, T017, T020 |
 | FR-004 one-way completion; US2 scenario 1 | T018–T019 | T016–T017, T020, T034 |
-| FR-005 retain visible completed until confirmed delete; US2 scenario 2; SC-003 | T019, T024, T030 | T017, T022, T028, T020, T025, T031, T034 |
+| FR-005 retain visible completed until confirmed delete; US2 scenario 2; SC-003 | T019, T024, T030 | T017, T021–T022, T028, T020, T025, T031, T034 |
 | FR-006 request/confirm/cancel delete only target; US3 scenarios 1–3; SC-004 | T029–T030 | T027–T028, T031, T034 |
-| FR-007 refresh/reopen retains titles/state and deletion outcomes; US4 scenarios 1–3; SC-005 | T007, T013, T019, T024, T030 | T005, T017, T022, T028, T020, T025, T031, T034 |
+| FR-007 refresh/reopen retains titles/state and deletion outcomes; US4 scenarios 1–3; SC-005 | T007, T013, T019, T024, T030 | T005, T017, T021–T022, T028, T020, T025, T031, T034 |
 | FR-008 invalid saved data/load failure reported without overwrite | T006–T007, T013, T023–T024 | T004–T005, T021–T022, T008, T025, T033 |
 | FR-009 failed save reported without false success/overwrite | T007, T013, T019, T023–T024, T030 | T005, T011, T017, T021–T022, T028, T015, T020, T025, T031, T033 |
 | FR-010 no login/sharing/collaboration; US1 scenario 4 | T001, T013, T032 | T011, T015, T034–T035 |
 | SC-001 add/find within 30 seconds | T013–T014 | T015, T034 |
 | Accessible UI and plain-text title contract | T013–T014, T019, T030 | T011, T017, T028, T032, T034 |
-| Start/test/build instructions and recorded core-flow evidence | T001–T003, T009, T026, T035 | T008, T015, T020, T025, T031, T033–T034 |
+| Start/test/build instructions and recorded core-flow evidence | T001–T003, T009, T026, T035 | T008, T015, T020, T025, T031, T033–T035 |
 
 Every required behavior has implementation plus verification coverage. Adapter safety is foundational because saving unsafely even during an MVP would violate the constitution. Final manual checks do not replace the automated failure matrix.
 
