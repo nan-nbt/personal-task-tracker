@@ -16,9 +16,9 @@ Tasks use `- [ ] Tnnn [P?] [USn?] Description with file path`. Paths are reposit
 
 **Purpose**: Establish the standalone app and existing project checks without overwriting repository documentation or configuration.
 
-- [ ] T001 Create `package.json` and `package-lock.json` for React/React DOM, TypeScript, Vite/React plugin, Vitest, React Testing Library, jsdom, jest-dom, and user-event; select compatible stable versions meeting Node engine constraints and lock them; supply `dev`, `test` (`vitest run`), `build` (`tsc -b && vite build`), and `preview` scripts without company dependencies
-- [ ] T002 Configure `vite.config.ts`, `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json`, and `src/test/setup.ts` for React, strict TypeScript, jsdom, jest-dom, RTL cleanup, and mock/storage isolation between tests
-- [ ] T003 Create `index.html`, `src/main.tsx`, minimal `src/App.tsx`, and `src/styles.css` with a React StrictMode root; update existing `.gitignore` for node_modules and build artifacts without replacing existing entries; create no persistence effects or unrelated sample features
+- [X] T001 Create `package.json` and `package-lock.json` for React/React DOM, TypeScript, Vite/React plugin, Vitest, React Testing Library, jsdom, jest-dom, and user-event; select compatible stable versions meeting Node engine constraints and lock them; supply `dev`, `test` (`vitest run`), `build` (`tsc -b && vite build`), and `preview` scripts without company dependencies
+- [X] T002 Configure `vite.config.ts`, `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json`, and `src/test/setup.ts` for React, strict TypeScript, jsdom, jest-dom, RTL cleanup, and mock/storage isolation between tests
+- [X] T003 Create `index.html`, `src/main.tsx`, minimal `src/App.tsx`, and `src/styles.css` with a React StrictMode root; update existing `.gitignore` for node_modules and build artifacts without replacing existing entries; create no persistence effects or unrelated sample features
 
 ## Phase 2: Foundational (Blocking Prerequisites)
 
@@ -26,12 +26,12 @@ Tasks use `- [ ] Tnnn [P?] [USn?] Description with file path`. Paths are reposit
 
 **Boundary contracts**: `src/tasks.ts` exports Task (`id`, `title`, `completed`), version-1 snapshot types, title/payload validation, and explicit success/error results. `src/taskStorage.ts` exports `loadTasks` and `saveTasks` results and key `task-tracker.tasks`; safely access storage at call time, never at module import. Pure add/complete/delete helpers are implemented in their story phases.
 
-- [ ] T004 [P] Write failing table-driven tests in `src/tasks.test.ts` for blank/spaces/tabs/line-break/mixed-whitespace titles, preserved valid strings, non-null object snapshot root, numeric version 1, task array, valid field types, nonblank IDs, unique IDs, whole-payload rejection, and copying recognized fields only while tolerating extras per `data-model.md`
-- [ ] T005 [P] Write failing adapter tests in `src/taskStorage.test.ts` for missing key versus malformed/empty/null/wrong-version data, one invalid member, duplicate IDs, storage getter/read exceptions, valid empty/nonempty round trips, and unchanged unrelated keys; assert zero writes/removals on every load path and unchanged seeded raw bytes on validation/serialization/access/setItem failures
-- [ ] T006 Implement types and validators in `src/tasks.ts` to satisfy T004: use `trim().length > 0` only to validate and retain original valid titles; accept duplicate titles, reject duplicate IDs, validate every task before accepting any, and add no title-length/character/task-count restrictions
-- [ ] T007 Implement `src/taskStorage.ts` to satisfy T005: distinguish `getItem` null from corrupt data, parse and validate the whole versioned snapshot, validate/serialize candidate before one `setItem`, catch all boundary errors, return explicit errors, and never call clear/removeItem, repair corrupt data, or perform a cleanup write
-- [ ] T008 Run `npm test -- src/tasks.test.ts src/taskStorage.test.ts` and `npm run build`; fix failures in `src/tasks.ts`, `src/taskStorage.ts`, and setup files and record actual commands, failure-to-pass evidence, and final outcomes in `specs/001-personal-task-tracker/quickstart.md`
-- [ ] T009 Update `specs/001-personal-task-tracker/quickstart.md` with actual Node/tooling prerequisites, `npm ci`, `npm test`, `npm run build`, and `npm run dev -- --host 127.0.0.1 --port 5173 --strictPort` instructions, same-profile/origin limits, and an execution-evidence section that leaves unrun checks explicitly NOT RUN
+- [X] T004 [P] Write failing table-driven tests in `src/tasks.test.ts` for blank/spaces/tabs/line-break/mixed-whitespace titles, preserved valid strings, non-null object snapshot root, numeric version 1, task array, valid field types, nonblank IDs, unique IDs, whole-payload rejection, and copying recognized fields only while tolerating extras per `data-model.md`
+- [X] T005 [P] Write failing adapter tests in `src/taskStorage.test.ts` for missing key versus malformed/empty/null/wrong-version data, one invalid member, duplicate IDs, storage getter/read exceptions, valid empty/nonempty round trips, and unchanged unrelated keys; assert zero writes/removals on every load path and unchanged seeded raw bytes on validation/serialization/access/setItem failures
+- [X] T006 Implement types and validators in `src/tasks.ts` to satisfy T004: use `trim().length > 0` only to validate and retain original valid titles; accept duplicate titles, reject duplicate IDs, validate every task before accepting any, and add no title-length/character/task-count restrictions
+- [X] T007 Implement `src/taskStorage.ts` to satisfy T005: distinguish `getItem` null from corrupt data, parse and validate the whole versioned snapshot, validate/serialize candidate before one `setItem`, catch all boundary errors, return explicit errors, and never call clear/removeItem, repair corrupt data, or perform a cleanup write
+- [X] T008 Run `npm test -- src/tasks.test.ts src/taskStorage.test.ts` and `npm run build`; fix failures in `src/tasks.ts`, `src/taskStorage.ts`, and setup files and record actual commands, failure-to-pass evidence, and final outcomes in `specs/001-personal-task-tracker/quickstart.md`
+- [X] T009 Update `specs/001-personal-task-tracker/quickstart.md` with actual Node/tooling prerequisites, `npm ci`, `npm test`, `npm run build`, and `npm run dev -- --host 127.0.0.1 --port 5173 --strictPort` instructions, same-profile/origin limits, and an execution-evidence section that leaves unrun checks explicitly NOT RUN
 
 **Checkpoint**: Foundation is complete only after T008 passes. Every mutation below saves before committing displayed state; persistence is not deferred to US4. US4 adds comprehensive restoration/error verification and hardening.
 
@@ -43,15 +43,15 @@ Tasks use `- [ ] Tnnn [P?] [USn?] Description with file path`. Paths are reposit
 
 ### Core Flow Verification (tests first)
 
-- [ ] T010 [P] [US1] Add failing add-candidate tests in `src/tasks.test.ts`: append original valid title with unique generated ID and `completed: false`, allow same-title tasks, retain insertion order, reject invalid titles/IDs or ID collisions, and never mutate the input array
-- [ ] T011 [P] [US1] Write failing role/label-based RTL tests in `src/App.test.tsx` for fresh list, labeled title input, valid add and visible statuses, mixed completed/incomplete seeded list, blank submission feedback/no writes, duplicate/Unicode/markup-like titles rendered as text, no login/sharing controls, and failed-add draft/list/raw-value preservation
+- [X] T010 [P] [US1] Add failing add-candidate tests in `src/tasks.test.ts`: append original valid title with unique generated ID and `completed: false`, allow same-title tasks, retain insertion order, reject invalid titles/IDs or ID collisions, and never mutate the input array
+- [X] T011 [P] [US1] Write failing role/label-based RTL tests in `src/App.test.tsx` for fresh list, labeled title input, valid add and visible statuses, mixed completed/incomplete seeded list, blank submission feedback/no writes, duplicate/Unicode/markup-like titles rendered as text, no login/sharing controls, and failed-add draft/list/raw-value preservation
 
 ### Implementation
 
-- [ ] T012 [US1] Implement pure add-candidate operation in `src/tasks.ts`; generate new IDs with `crypto.randomUUID` at the caller boundary and validate uniqueness before accepting a candidate; return actionable errors instead of changing valid tasks
-- [ ] T013 [US1] Implement form/list in `src/App.tsx` with validated lazy `loadTasks`, ready versus blocking load-error states, title validation, stable-ID rows and textual completion status; on add call `saveTasks` before setting React task state/clearing draft, preserve draft/list on error, render strings as text, and never write in render/updaters/mount effects
-- [ ] T014 [US1] Implement minimal keyboard-usable layout and visible error/status/focus styling in `src/styles.css`; use associated input labels, semantic form/list/buttons and alert feedback in `src/App.tsx`, with completion cues not dependent on color alone
-- [ ] T015 [US1] Run `npm test -- src/tasks.test.ts src/App.test.tsx`; manually time adding/finding a task at `http://127.0.0.1:5173` using the quickstart command, verify under 30 seconds plus no-login/blank-title behavior, and record command/results, browser, origin and duration in `specs/001-personal-task-tracker/quickstart.md`
+- [X] T012 [US1] Implement pure add-candidate operation in `src/tasks.ts`; generate new IDs with `crypto.randomUUID` at the caller boundary and validate uniqueness before accepting a candidate; return actionable errors instead of changing valid tasks
+- [X] T013 [US1] Implement form/list in `src/App.tsx` with validated lazy `loadTasks`, ready versus blocking load-error states, title validation, stable-ID rows and textual completion status; on add call `saveTasks` before setting React task state/clearing draft, preserve draft/list on error, render strings as text, and never write in render/updaters/mount effects
+- [X] T014 [US1] Implement minimal keyboard-usable layout and visible error/status/focus styling in `src/styles.css`; use associated input labels, semantic form/list/buttons and alert feedback in `src/App.tsx`, with completion cues not dependent on color alone
+- [X] T015 [US1] Run `npm test -- src/tasks.test.ts src/App.test.tsx`; manually time adding/finding a task at `http://127.0.0.1:5173` using the quickstart command, verify under 30 seconds plus no-login/blank-title behavior, and record command/results, browser, origin and duration in `specs/001-personal-task-tracker/quickstart.md`
 
 **Checkpoint**: Usable add/view/validation MVP with safe storage. Completion and deletion controls are not yet delivered; do not describe the MVP as the full feature.
 
@@ -63,14 +63,14 @@ Tasks use `- [ ] Tnnn [P?] [USn?] Description with file path`. Paths are reposit
 
 ### Core Flow Verification (tests first)
 
-- [ ] T016 [P] [US2] Write failing complete-candidate tests in `src/tasks.test.ts` for selecting stable ID, preserving peers/order/input, rejecting unknown/invalid IDs, and treating already-completed targets as no-op without reversal
-- [ ] T017 [P] [US2] Write failing RTL tests in `src/App.test.tsx` for complete action, retained complete text, no mark-incomplete or reversal action, same-storage remount restoration, and failed save preserving displayed incomplete state and seeded raw bytes with feedback; test repeated-completion no-op only at the model boundary in T016
+- [X] T016 [P] [US2] Write failing complete-candidate tests in `src/tasks.test.ts` for selecting stable ID, preserving peers/order/input, rejecting unknown/invalid IDs, and treating already-completed targets as no-op without reversal
+- [X] T017 [P] [US2] Write failing RTL tests in `src/App.test.tsx` for complete action, retained complete text, no mark-incomplete or reversal action, same-storage remount restoration, and failed save preserving displayed incomplete state and seeded raw bytes with feedback; test repeated-completion no-op only at the model boundary in T016
 
 ### Implementation
 
-- [ ] T018 [US2] Implement pure complete-candidate result in `src/tasks.ts` with distinct changed/no-op/error outcomes; unknown targets are errors, already-completed targets are no-op, and no reversal operation exists
-- [ ] T019 [US2] Add stable-ID complete actions in `src/App.tsx`; persist changed candidates before updating state, do not write for no-op/error, keep completed rows visible, report actionable target/save errors, and provide no reversal control
-- [ ] T020 [US2] Run `npm test -- src/tasks.test.ts src/App.test.tsx`; verify completed visibility and refresh/close-reopen on the same browser profile/origin using `quickstart.md`, and record exact automated/manual outcomes in `specs/001-personal-task-tracker/quickstart.md`
+- [X] T018 [US2] Implement pure complete-candidate result in `src/tasks.ts` with distinct changed/no-op/error outcomes; unknown targets are errors, already-completed targets are no-op, and no reversal operation exists
+- [X] T019 [US2] Add stable-ID complete actions in `src/App.tsx`; persist changed candidates before updating state, do not write for no-op/error, keep completed rows visible, report actionable target/save errors, and provide no reversal control
+- [X] T020 [US2] Run `npm test -- src/tasks.test.ts src/App.test.tsx`; verify completed visibility and refresh/close-reopen on the same browser profile/origin using `quickstart.md`, and record exact automated/manual outcomes in `specs/001-personal-task-tracker/quickstart.md`
 
 **Checkpoint**: Complete/retain flow passes independently on a seeded task list; no deletion feature is needed for this check.
 
@@ -82,15 +82,15 @@ Tasks use `- [ ] Tnnn [P?] [USn?] Description with file path`. Paths are reposit
 
 ### Core Flow Verification (tests first)
 
-- [ ] T021 [US4] Add a focused StrictMode integration test in `src/App.test.tsx` proving React mount/remount reads valid and corrupt saved data without writing or removing storage
-- [ ] T022 [US4] Extend `src/App.test.tsx` with add/complete unmount/remount restoration and load/save error UI tests for corrupt/getter/read failures; assert blocking actionable feedback, unavailable mutations, failed-save no-success/list/draft preservation, and later successful retry clearing the save error
+- [X] T021 [US4] Add a focused StrictMode integration test in `src/App.test.tsx` proving React mount/remount reads valid and corrupt saved data without writing or removing storage
+- [X] T022 [US4] Extend `src/App.test.tsx` with add/complete unmount/remount restoration and load/save error UI tests for corrupt/getter/read failures; assert blocking actionable feedback, unavailable mutations, failed-save no-success/list/draft preservation, and later successful retry clearing the save error
 
 ### Implementation and verification
 
-- [ ] T023 [US4] Review `src/taskStorage.ts` against the T005 tests and fix only any observed failures; do not duplicate the corruption/failure test matrix or add reset, migration, backup, queue or partial recovery
-- [ ] T024 [US4] Harden `src/App.tsx` load/error and transaction handling against T022; disable mutations after failed load, suggest resolving storage/reloading, commit only saved candidates, preserve last-good tasks on error, clear stale save errors after successful retry, and keep all storage side effects outside React updaters/effects
-- [ ] T025 [US4] Run `npm test -- src/taskStorage.test.ts src/App.test.tsx`; follow same-origin refresh and normal browser close/reopen checks for mixed-state retained tasks from `quickstart.md`, record results in `specs/001-personal-task-tracker/quickstart.md`, and explicitly mark the confirmed/cancelled-deletion subscenarios pending T031 rather than passed
-- [ ] T026 [US4] Update `specs/001-personal-task-tracker/quickstart.md` to reflect implemented storage key/version, supported browser/origin assumptions, load/save feedback, unchanged-data guarantees and run instructions; retain accurate evidence and reference `data-model.md`/`contracts/ui-and-storage.md` rather than duplicating implementation
+- [X] T023 [US4] Review `src/taskStorage.ts` against the T005 tests and fix only any observed failures; do not duplicate the corruption/failure test matrix or add reset, migration, backup, queue or partial recovery
+- [X] T024 [US4] Harden `src/App.tsx` load/error and transaction handling against T022; disable mutations after failed load, suggest resolving storage/reloading, commit only saved candidates, preserve last-good tasks on error, clear stale save errors after successful retry, and keep all storage side effects outside React updaters/effects
+- [X] T025 [US4] Run `npm test -- src/taskStorage.test.ts src/App.test.tsx`; follow same-origin refresh and normal browser close/reopen checks for mixed-state retained tasks from `quickstart.md`, record results in `specs/001-personal-task-tracker/quickstart.md`, and explicitly mark the confirmed/cancelled-deletion subscenarios pending T031 rather than passed
+- [X] T026 [US4] Update `specs/001-personal-task-tracker/quickstart.md` to reflect implemented storage key/version, supported browser/origin assumptions, load/save feedback, unchanged-data guarantees and run instructions; retain accurate evidence and reference `data-model.md`/`contracts/ui-and-storage.md` rather than duplicating implementation
 
 **Checkpoint**: US4's add/completion restoration and errors are verified; its deletion acceptance scenarios cannot be closed until T031. Priority ordering is preserved without pretending a dependency is implemented.
 
@@ -102,14 +102,14 @@ Tasks use `- [ ] Tnnn [P?] [USn?] Description with file path`. Paths are reposit
 
 ### Core Flow Verification (tests first)
 
-- [ ] T027 [P] [US3] Write failing delete-candidate tests in `src/tasks.test.ts` for immutable selected-ID removal, preservation of same-title peers/title/state/order, rejection of invalid/unknown IDs, and valid empty candidate after last-task deletion
-- [ ] T028 [P] [US3] Write failing native-confirm RTL tests in `src/App.test.tsx` for both task states, inspecting no removal/write before prompt answer; cover cancel no-op, confirm only selected ID, duplicate titles, failed confirmed-delete save retaining UI/raw bytes, and remount proving confirmed deletion absent/cancelled deletion unchanged
+- [X] T027 [P] [US3] Write failing delete-candidate tests in `src/tasks.test.ts` for immutable selected-ID removal, preservation of same-title peers/title/state/order, rejection of invalid/unknown IDs, and valid empty candidate after last-task deletion
+- [X] T028 [P] [US3] Write failing native-confirm RTL tests in `src/App.test.tsx` for both task states, inspecting no removal/write before prompt answer; cover cancel no-op, confirm only selected ID, duplicate titles, failed confirmed-delete save retaining UI/raw bytes, and remount proving confirmed deletion absent/cancelled deletion unchanged
 
 ### Implementation
 
-- [ ] T029 [US3] Implement pure delete-candidate operation in `src/tasks.ts` returning an error for unavailable IDs and removing only the selected task from a copied list without mutating peers
-- [ ] T030 [US3] Add accessible per-row delete actions in `src/App.tsx`; validate target before native `window.confirm` identifying its title, return without writes on cancellation, save confirmed candidate before committing removal, and preserve prior data/show actionable failure on save error
-- [ ] T031 [US3] Run `npm test -- src/tasks.test.ts src/taskStorage.test.ts src/App.test.tsx`; manually confirm/cancel deletion for both states and repeat the full US4 add/complete/confirm-one/cancel-another refresh and close-reopen sequence; record commands/browser/profile/origin/results in `specs/001-personal-task-tracker/quickstart.md` and close pending US4 deletion checks only when they pass
+- [X] T029 [US3] Implement pure delete-candidate operation in `src/tasks.ts` returning an error for unavailable IDs and removing only the selected task from a copied list without mutating peers
+- [X] T030 [US3] Add accessible per-row delete actions in `src/App.tsx`; validate target before native `window.confirm` identifying its title, return without writes on cancellation, save confirmed candidate before committing removal, and preserve prior data/show actionable failure on save error
+- [X] T031 [US3] Run `npm test -- src/tasks.test.ts src/taskStorage.test.ts src/App.test.tsx`; manually confirm/cancel deletion for both states and repeat the full US4 add/complete/confirm-one/cancel-another refresh and close-reopen sequence; record commands/browser/profile/origin/results in `specs/001-personal-task-tracker/quickstart.md` and close pending US4 deletion checks only when they pass
 
 **Checkpoint**: US3 confirmation/cancellation and US4 deletion persistence all pass; completed tasks remain until successfully saved confirmed deletion.
 
@@ -117,10 +117,10 @@ Tasks use `- [ ] Tnnn [P?] [USn?] Description with file path`. Paths are reposit
 
 **Purpose**: Final evidence, scope check, and accurate start/test instructions; no speculative refactor or tooling.
 
-- [ ] T032 Review `src/App.tsx`, `src/styles.css`, `src/tasks.ts`, and `src/taskStorage.ts` against `specs/001-personal-task-tracker/contracts/ui-and-storage.md` and FR-001–FR-010; correct actual accessibility/data-safety gaps, ensure no HTML injection or unapproved features, and retain native confirmation/minimal module boundaries
-- [ ] T033 After the last code edit run `npm test` and `npm run build` from the root using `package.json`; fix failures and record actual final command/date/test summary/type-check/build results in `specs/001-personal-task-tracker/quickstart.md`
-- [ ] T034 Repeat every real-browser core-flow scenario in `specs/001-personal-task-tracker/quickstart.md` on an isolated same-origin/profile: timed add/find under 30 seconds, invalid submission, completed visibility, both-state deletion confirm/cancel, refresh, and normal close/reopen; record expected versus observed tasks/states/deletions and pass/fail, never substitute jsdom for real reopening
-- [ ] T035 Finalize `specs/001-personal-task-tracker/quickstart.md` start/test instructions and actual verification evidence; check this `specs/001-personal-task-tracker/tasks.md` against the traceability matrix; report incomplete/blocked checks explicitly; close implementation only after all required flows and final checks pass
+- [X] T032 Review `src/App.tsx`, `src/styles.css`, `src/tasks.ts`, and `src/taskStorage.ts` against `specs/001-personal-task-tracker/contracts/ui-and-storage.md` and FR-001–FR-010; correct actual accessibility/data-safety gaps, ensure no HTML injection or unapproved features, and retain native confirmation/minimal module boundaries
+- [X] T033 After the last code edit run `npm test` and `npm run build` from the root using `package.json`; fix failures and record actual final command/date/test summary/type-check/build results in `specs/001-personal-task-tracker/quickstart.md`
+- [X] T034 Repeat every real-browser core-flow scenario in `specs/001-personal-task-tracker/quickstart.md` on an isolated same-origin/profile: timed add/find under 30 seconds, invalid submission, completed visibility, both-state deletion confirm/cancel, refresh, and normal close/reopen; record expected versus observed tasks/states/deletions and pass/fail, never substitute jsdom for real reopening
+- [X] T035 Finalize `specs/001-personal-task-tracker/quickstart.md` start/test instructions and actual verification evidence; check this `specs/001-personal-task-tracker/tasks.md` against the traceability matrix; report incomplete/blocked checks explicitly; close implementation only after all required flows and final checks pass
 
 
 ## Dependencies & Execution Order

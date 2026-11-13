@@ -2,9 +2,9 @@
 
 ## Status and prerequisites
 
-This is a planning artifact. Application source, package manifest, and scripts do not yet exist; the commands below become runnable after implementation adds the project described in [plan.md](plan.md). No test/build result is claimed during planning.
+The standalone React/TypeScript/Vite application is implemented. Runtime prerequisite: Node.js 22.12+ (verified with Node v24.18.0), npm, and a modern browser with localStorage and `crypto.randomUUID`. The package manifest requires Node >=22.12. Use one browser profile, one active app tab, and the same origin (including port) for persistence checks. Use an isolated test browser profile/origin to avoid changing personal data.
 
-Proposed prerequisites: Node.js 22.12+ or a newer LTS satisfying selected package engines, npm, and a modern browser with localStorage and `crypto.randomUUID`. Use one browser profile, one active app tab, and the same origin (including port) for all persistence checks. Use an isolated test browser profile/origin to avoid changing personal data.
+Storage uses localStorage key `task-tracker.tasks`, containing the version-1 `{ "version": 1, "tasks": [...] }` snapshot. Missing key means a fresh list; malformed or invalid snapshots block mutations and show an error without modifying saved bytes. Save failures retain the last displayed and stored tasks (and a submitted draft), show an alert, and make no success claim. See [data-model.md](data-model.md) and [contracts/ui-and-storage.md](contracts/ui-and-storage.md) for the exact constraints and failure behavior.
 
 ## Setup and run (after implementation)
 
@@ -17,15 +17,15 @@ npm run build
 npm run dev -- --host 127.0.0.1 --port 5173 --strictPort
 ```
 
-The implementation must first supply `package.json` and `package-lock.json`; `npm ci` is not a scaffolding step. Scripts must run Vitest once (`vitest run`) and type-check plus build (`tsc -b && vite build`). Open `http://127.0.0.1:5173`. Strict port prevents an automatic origin change hiding saved tasks. Previewing the static build on another port uses a separate storage origin and is not a persistence failure.
+`package.json` and `package-lock.json` are checked in. `npm ci` installs the locked dependencies. Scripts run Vitest once (`vitest run`) and type-check plus build (`tsc -b && vite build`). Open `http://127.0.0.1:5173`. Strict port prevents an automatic origin change hiding saved tasks. Previewing the static build on another port uses a separate storage origin and is not a persistence failure.
 
 For data constraints and boundary behavior see [data-model.md](data-model.md) and [contracts/ui-and-storage.md](contracts/ui-and-storage.md); this guide does not duplicate implementation code.
 
 ## Automated validation matrix
 
-All named tests are planned coverage, not existing tests.
+The executable coverage currently includes model validation and immutable add/complete/delete operations, storage validation/failure handling, and role/label-based UI flows. The focused tests are in `src/tasks.test.ts`, `src/taskStorage.test.ts`, and `src/App.test.tsx`.
 
-| Specification coverage | Planned executable checks | Expected result |
+| Specification coverage | Executable checks | Expected result |
 |------------------------|---------------------------|-----------------|
 | US1 scenarios 1, 3, 4; FR-001/003/010 | `App.test.tsx`: add a valid title, inspect all titles/statuses, initial empty state, no login controls | New incomplete task visible; all retained tasks accessible without login |
 | US1 scenario 2; FR-002; SC-002 | `tasks.test.ts`: table of empty/spaces/tabs/line breaks/mixed whitespace; `App.test.tsx`: invalid submit with pre-existing tasks | Every whitespace-only input rejected; feedback visible; list/raw storage unchanged, no write |
@@ -42,6 +42,8 @@ Test setup must reset mocks and storage between cases. Use RTL role/label querie
 
 ## Real-browser core-flow validation
 
+**Status**: The owner reports reviewing and confirming all previously uncompleted real-browser scenarios by following this Quickstart. The confirmation covers timed add/find, invalid submission, completion visibility, deletion confirmation/cancellation for both task states, same-origin refresh, and normal close/reopen. No browser/version, profile/origin, duration, or detailed observations were supplied in the confirmation; see the evidence note below. jsdom tests are separate automated verification and are not substituted for the owner's browser checks.
+
 1. Open a fresh isolated test origin. Verify no login screen or collaboration UI.
 2. Start a timer, add `Buy groceries`, and find the visible incomplete task. Expected: within 30 seconds (SC-001). Record measured duration.
 3. Add `Call dentist`, plus a third task to delete. Submit empty and spaces-only titles. Expected: actionable title feedback and unchanged existing list.
@@ -55,13 +57,23 @@ Use the automated failure matrix for quota/denied-storage/corruption cases; do n
 
 ## Completion evidence to record during implementation
 
-| Check | Result during planning | Evidence required after implementation |
-|-------|------------------------|----------------------------------------|
-| `npm test` | NOT RUN: application not implemented | Command, date, pass/fail, test summary |
-| `npm run build` | NOT RUN: no package manifest | Command, date, type-check/build result |
-| Timed add/find (SC-001) | NOT RUN | Browser/version, duration, outcome |
-| Refresh persistence (SC-003/SC-005) | NOT RUN | Browser/profile/origin and observed titles/states/deletions |
-| Close/reopen persistence (SC-003/SC-005) | NOT RUN | Same profile/origin, observed outcome |
-| Confirmation/cancellation (SC-004) | NOT RUN | Incomplete and completed task outcomes |
+| Check | Result | Evidence |
+|-------|--------|----------|
+| Foundation tests | PASS, 34 tests | `npm test -- src/tasks.test.ts src/taskStorage.test.ts`; initial RED run had four expected failures before implementation. |
+| Final automated suite | PASS, 62 tests | After clean dependency install, `npm ci && npm test`, 2026-11-13. |
+| Final production build | PASS | `npm run build` (`tsc -b && vite build`), 2026-11-13. |
+| Timed add/find (SC-001) | OWNER-CONFIRMED PASS | Owner confirmed following Quickstart; duration and browser/version not supplied. |
+| Refresh persistence (SC-003/SC-005) | OWNER-CONFIRMED PASS | Owner confirmed same-browser Quickstart flow; profile/origin details not supplied. |
+| Close/reopen persistence (SC-003/SC-005) | OWNER-CONFIRMED PASS | Owner confirmed following Quickstart; browser/profile details not supplied. |
+| Confirmation/cancellation (SC-004) | OWNER-CONFIRMED PASS; AUTOMATED PASS | Owner confirmed both-state deletion confirmation/cancellation; tests also cover cancel no-write, failed save and remount outcome. |
 
-Do not report implementation complete until required core-flow checks pass and actual results are recorded. SC-002 is proven by table-driven automated rejection tests; SC-003/SC-004 use both automated and browser observations; SC-005 requires the explicit refresh and close/reopen checks above.
+### Execution evidence (2026-11-13)
+
+- Automated-test environment: Node v24.18.0, npm 11.16.0. The owner separately confirmed the browser checks described above; browser/version, exact profile/origin, and timing were not included in the confirmation.
+- `npm test -- src/tasks.test.ts src/taskStorage.test.ts`: PASS, 34 tests; initial RED run failed as expected on missing title/payload/storage behavior.
+- `npm ci && npm test`: PASS after clean locked dependency installation; 62 tests across the model, storage adapter, and application UI.
+- `npm run build`: PASS; TypeScript type-check and Vite production build completed.
+- Owner's confirmation: “I've reviewed and confirm by test following quickstart those all not completed task.” This is recorded as confirmation that the Quickstart's real-browser core-flow checks were performed and passed; specific environment metadata and measured duration were not provided.
+- The owner-confirmed checks complete the browser-dependent portions of T015, T020, T025 and T031, as well as T034. Automated RTL tests remain a separate form of evidence; they are not claimed as real-browser verification.
+
+SC-001/003/004/005 browser scenarios are owner-confirmed per this report. Timing, browser version, profile/origin, and detailed observed task states remain unspecified.

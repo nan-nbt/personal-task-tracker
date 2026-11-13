@@ -1,3 +1,9 @@
+node_modules/
+dist/
+build/
+*.log
+.env*
+
 # PCG Spec Kit installed commands START
 /.opencode/commands/speckit.agent-context.update.md
 /.opencode/commands/speckit.analyze.md
