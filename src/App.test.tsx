@@ -234,4 +234,69 @@ describe('personal task tracker', () => {
     expect(write).not.toHaveBeenCalled();
     expect(remove).not.toHaveBeenCalled();
   });
+
+  it('shows accessible explanatory icon tips on hover and focus and dismisses them with Escape', async () => {
+    const user = userEvent.setup();
+    seed([
+      { id: 'one', title: 'Finish report', completed: false },
+      { id: 'two', title: 'Already done', completed: true },
+    ]);
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const write = vi.spyOn(Storage.prototype, 'setItem');
+    const confirm = vi.spyOn(window, 'confirm');
+    render(<App />);
+
+    const complete = screen.getByRole('button', { name: 'Mark Finish report complete' });
+    const deleteIncomplete = screen.getByRole('button', { name: 'Delete Finish report' });
+    const deleteComplete = screen.getByRole('button', { name: 'Delete Already done' });
+    expect(screen.queryByRole('button', { name: /Mark Already done complete/ })).not.toBeInTheDocument();
+    expect(complete.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+    expect(complete.querySelector('svg')).toHaveAttribute('focusable', 'false');
+    expect(complete).not.toHaveAttribute('title');
+
+    await user.hover(complete);
+    const completeTip = screen.getByRole('tooltip', { name: 'Mark as complete' });
+    expect(complete.getAttribute('aria-describedby')?.split(' ')).toContain(completeTip.id);
+    await user.unhover(complete);
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+
+    await user.tab(); // Task title input
+    await user.tab(); // Add task button
+    await user.tab(); // Completion icon
+    expect(complete).toHaveFocus();
+    expect(screen.getByRole('tooltip', { name: 'Mark as complete' })).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+    expect(complete).toHaveFocus();
+    expect(write).not.toHaveBeenCalled();
+    expect(confirm).not.toHaveBeenCalled();
+    expect(localStorage.getItem(STORAGE_KEY)).toBe(raw);
+
+    await user.tab();
+    expect(deleteIncomplete).toHaveFocus();
+    expect(screen.getByRole('tooltip', { name: 'Delete task' })).toBeInTheDocument();
+    await user.tab();
+    expect(deleteComplete).toHaveFocus();
+    expect(screen.getByRole('tooltip', { name: 'Delete task' })).toBeInTheDocument();
+    expect(new Set(Array.from(document.querySelectorAll('[role="tooltip"]')).map((tip) => tip.id)).size)
+      .toBe(document.querySelectorAll('[role="tooltip"]').length);
+  });
+
+  it('keeps each task action group before its title and status', () => {
+    seed([
+      { id: 'one', title: 'A long task title '.repeat(10), completed: false },
+      { id: 'two', title: 'A long task title '.repeat(10), completed: true },
+    ]);
+    render(<App />);
+
+    for (const row of taskRows()) {
+      const actions = row.querySelector('.task-actions');
+      const title = row.querySelector('.task-title');
+      if (!actions || !title) throw new Error('Task row is missing its action group or title.');
+      const status = within(row).getByText(/^(Incomplete|Complete)$/);
+      expect(row.compareDocumentPosition(actions) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
+      expect(actions.compareDocumentPosition(title) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
+      expect(title.compareDocumentPosition(status) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
+    }
+  });
 });
