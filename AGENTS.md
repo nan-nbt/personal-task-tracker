@@ -66,5 +66,5 @@ If technical constraints require a change, AI must:
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
-at specs/001-personal-task-tracker/plan.md
+at specs/003-right-align-task-status/plan.md
 <!-- SPECKIT END -->
