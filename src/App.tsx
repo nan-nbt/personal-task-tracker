@@ -1,6 +1,57 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useId, useState, type FormEvent, type ReactNode } from 'react';
 import { addTask, completeTask, deleteTask, isValidTitle, type Task } from './tasks';
 import { loadTasks, saveTasks } from './taskStorage';
+
+type TaskActionButtonProps = {
+  name: string;
+  tip: string;
+  icon: ReactNode;
+  disabled: boolean;
+  onClick: () => void;
+};
+
+function TaskActionButton({ name, tip, icon, disabled, onClick }: TaskActionButtonProps) {
+  const tooltipId = useId();
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+  const visible = (hovered || focused) && !dismissed;
+
+  useEffect(() => {
+    if (!hovered && !focused && dismissed) setDismissed(false);
+  }, [hovered, focused, dismissed]);
+
+  return (
+    <span
+      className="task-action"
+      onPointerEnter={() => setHovered(true)}
+      onPointerLeave={() => setHovered(false)}
+      onFocus={() => setFocused(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocused(false);
+      }}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape' && visible) {
+          event.preventDefault();
+          event.stopPropagation();
+          setDismissed(true);
+        }
+      }}
+    >
+      <button
+        type="button"
+        className="task-action-button"
+        aria-label={name}
+        aria-describedby={visible ? tooltipId : undefined}
+        disabled={disabled}
+        onClick={onClick}
+      >
+        {icon}
+      </button>
+      {visible && <span id={tooltipId} className="task-action-tooltip" role="tooltip">{tip}</span>}
+    </span>
+  );
+}
 
 export default function App() {
   const [loaded] = useState(() => loadTasks());
@@ -80,12 +131,26 @@ export default function App() {
       <ul aria-label="Tasks" className="task-list">
         {tasks.map((task) => (
           <li key={task.id} className={task.completed ? 'task completed' : 'task'}>
+            <div className="task-actions">
+              {!task.completed && (
+                <TaskActionButton
+                  name={`Mark ${task.title} complete`}
+                  tip="Mark as complete"
+                  icon={<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m5 12 4 4L19 6" /></svg>}
+                  disabled={blocked}
+                  onClick={() => complete(task.id)}
+                />
+              )}
+              <TaskActionButton
+                name={`Delete ${task.title}`}
+                tip="Delete task"
+                icon={<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 14h10l1-14M9 7V4h6v3" /></svg>}
+                disabled={blocked}
+                onClick={() => remove(task.id, task.title)}
+              />
+            </div>
             <span className="task-title">{task.title}</span>
             <span className="task-status">{task.completed ? 'Complete' : 'Incomplete'}</span>
-            <div className="task-actions">
-              {!task.completed && <button type="button" disabled={blocked} onClick={() => complete(task.id)}>Mark {task.title} complete</button>}
-              <button type="button" disabled={blocked} onClick={() => remove(task.id, task.title)}>Delete {task.title}</button>
-            </div>
           </li>
         ))}
       </ul>
