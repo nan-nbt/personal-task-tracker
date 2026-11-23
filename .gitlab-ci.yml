@@ -1,5 +1,9 @@
 image: node:22.12.0
 
+default:
+  tags:
+    - SGP-Test-K8s
+
 stages:
   - test
   - build
