@@ -7,6 +7,7 @@ default:
 stages:
   - test
   - build
+  - deploy
 
 cache:
   key:
@@ -26,14 +27,46 @@ before_script:
 
 test:
   stage: test
+  before_script:
+    - ': "${NPM_TOKEN:?Set NPM_TOKEN as a masked GitLab CI/CD variable}"'
+    - umask 077
+    - printf '%s\n' 'registry=https://repo.pouchen.com/repository/npm-pcc-group/' '//repo.pouchen.com/repository/npm-pcc-group/:_authToken=${NPM_TOKEN}' > .npmrc.ci
+    - export NPM_CONFIG_USERCONFIG="$CI_PROJECT_DIR/.npmrc.ci"
+    - npm ci --cache .npm --prefer-offline || { rm -f .npmrc.ci; exit 1; }
+    - rm -f .npmrc.ci
+    - unset NPM_TOKEN NPM_CONFIG_USERCONFIG
   script:
     - npm test
 
 build:
   stage: build
+  before_script:
+    - ': "${NPM_TOKEN:?Set NPM_TOKEN as a masked GitLab CI/CD variable}"'
+    - umask 077
+    - printf '%s\n' 'registry=https://repo.pouchen.com/repository/npm-pcc-group/' '//repo.pouchen.com/repository/npm-pcc-group/:_authToken=${NPM_TOKEN}' > .npmrc.ci
+    - export NPM_CONFIG_USERCONFIG="$CI_PROJECT_DIR/.npmrc.ci"
+    - npm ci --cache .npm --prefer-offline || { rm -f .npmrc.ci; exit 1; }
+    - rm -f .npmrc.ci
+    - unset NPM_TOKEN NPM_CONFIG_USERCONFIG
   script:
-    - npm run build
+    - npm run build -- --base=./
   artifacts:
     paths:
       - dist/
     expire_in: 1 week
+
+pages:
+  stage: deploy
+  before_script: []
+  needs:
+    - job: build
+      artifacts: true
+  script:
+    - mv dist public
+    - test -s public/index.html
+  pages: true
+  artifacts:
+    paths:
+      - public/
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
