@@ -16,7 +16,13 @@ cache:
     - .npm/
 
 before_script:
-  - npm ci --cache .npm --prefer-offline
+  - ': "${NPM_TOKEN:?Set NPM_TOKEN as a masked GitLab CI/CD variable}"'
+  - umask 077
+  - printf '%s\n' 'registry=https://repo.pouchen.com/repository/npm-pcc-group/' '//repo.pouchen.com/repository/npm-pcc-group/:_authToken=${NPM_TOKEN}' > .npmrc.ci
+  - export NPM_CONFIG_USERCONFIG="$CI_PROJECT_DIR/.npmrc.ci"
+  - npm ci --cache .npm --prefer-offline || { rm -f .npmrc.ci; exit 1; }
+  - rm -f .npmrc.ci
+  - unset NPM_TOKEN NPM_CONFIG_USERCONFIG
 
 test:
   stage: test
