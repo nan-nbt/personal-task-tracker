@@ -1,4 +1,4 @@
-image: node:22.12.0
+image: repo.pouchen.com/docker-pcc-group/library/node:24.15.0-alpine
 
 default:
   tags:
